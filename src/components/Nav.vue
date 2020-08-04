@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar navbar-expand-md bg-dark navbar-dark">
     <!-- Brand -->
-    <img src="/static/logo.png" class="rounded-circle" width="36px" height="36px" />
+    <!-- <img src="/static/logo.png" class="rounded-circle" width="36px" height="36px" /> -->
 
     <!-- Toggler/collapsibe Button -->
     <button

@@ -1,9 +1,9 @@
 {
-  "name": "webdicebot",
+  "name": "webdicebot-admin",
   "version": "1.0.0",
   "description": "A Vue.js project",
   "author": "mhqb365 <mhqb365@gmail.com>",
-  "private": true,
+  "private": false,
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "start": "npm run dev",

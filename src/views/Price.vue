@@ -8,7 +8,9 @@
       </router-link>
 
       <div class="table-responsive-sm">
-        <table class="table table-bordered table-sm bg-white">
+        <div v-if="isLoading" class="spinner-border"></div>
+
+        <table v-else class="table table-bordered table-sm bg-white">
           <thead>
             <th>Limit</th>
             <th>Amount</th>
@@ -44,7 +46,7 @@ export default {
   },
   data() {
     return {
-      loading: false,
+      isLoading: false,
       prices: [],
       perPage: 20,
       selectPer: [
@@ -78,7 +80,7 @@ export default {
   },
   methods: {
     fetchPrices: function (page) {
-      this.loading = !this.loading;
+      this.isLoading = !this.isLoading;
       axios({
         url:
           API_URL +
@@ -86,7 +88,7 @@ export default {
         method: "GET",
       })
         .then((response) => {
-          this.loading = !this.loading;
+          this.isLoading = !this.isLoading;
           // console.log(response.data);
           this.prices = response.data.docs;
           this.totalRows = response.data.length;

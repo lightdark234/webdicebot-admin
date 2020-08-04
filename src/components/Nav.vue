@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar navbar-expand-md bg-dark navbar-dark">
     <!-- Brand -->
-    <!-- <router-link to="/" class="navbar-brand">Admin</router-link> -->
+    <img src="/static/logo.png" class="rounded-circle" width="36px" height="36px" />
 
     <!-- Toggler/collapsibe Button -->
     <button

@@ -25,31 +25,39 @@
       </div>
 
       <div class="row text-white">
-        <div class="col-sm-12 col-md-6">
+        <div class="col-sm-12 col-md-3">
           <div class="rounded p-4 bg-warning mb-2 text-center">
             Income DOGE
-            <h4>{{ doge.toLocaleString() }}</h4>
+            <hr class="mt-2 mb-2" />
+            <div v-if="isLoading" class="spinner-border"></div>
+            <h4 v-else>{{ doge.toLocaleString() }}</h4>
           </div>
         </div>
 
-        <div class="col-sm-12 col-md-6">
+        <div class="col-sm-12 col-md-3">
           <div class="rounded p-4 bg-primary mb-2 text-center">
             License
-            <h4>{{ license }}</h4>
+            <hr class="mt-2 mb-2" />
+            <div v-if="isLoading" class="spinner-border"></div>
+            <h4 v-else>{{ license }}</h4>
           </div>
         </div>
 
-        <div class="col-sm-12 col-md-6">
+        <div class="col-sm-12 col-md-3">
           <div class="rounded p-4 bg-success mb-2 text-center">
             Pay
-            <h4>{{ pay }}</h4>
+            <hr class="mt-2 mb-2" />
+            <div v-if="isLoading" class="spinner-border"></div>
+            <h4 v-else>{{ pay }}</h4>
           </div>
         </div>
 
-        <div class="col-sm-12 col-md-6">
+        <div class="col-sm-12 col-md-3">
           <div class="rounded p-4 bg-danger mb-2 text-center">
             Free
-            <h4>{{ free }}</h4>
+            <hr class="mt-2 mb-2" />
+            <div v-if="isLoading" class="spinner-border"></div>
+            <h4 v-else>{{ free }}</h4>
           </div>
         </div>
       </div>
@@ -69,6 +77,8 @@ export default {
   },
   data() {
     return {
+      isLoading: false,
+      isActive: "",
       licenses: [],
       license: 0,
       free: 0,
@@ -76,14 +86,14 @@ export default {
       doge: 0,
       from: 0,
       to: 0,
-      isActive: "",
     };
   },
   mounted: function () {
-    this.fetchLicense();
+    this.fetch();
   },
   methods: {
-    fetchLicense: function () {
+    fetch: function () {
+      this.isLoading = !this.isLoading;
       axios({
         url: API_URL + "/license",
         method: "GET",
@@ -92,6 +102,7 @@ export default {
         },
       })
         .then((response) => {
+          this.isLoading = !this.isLoading;
           this.licenses = response.data;
           this.filter();
         })

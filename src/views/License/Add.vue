@@ -7,29 +7,34 @@
         <button type="button" class="btn btn-secondary mb-2">Cancel</button>
       </router-link>
 
-      <hr />
+      <hr class="mt-2 mb-2" />
 
-      <label>Email</label>
-      <div class="form-group">
-        <input type="text" class="form-control" v-model="email" />
+      <div v-if="isLoading" class="spinner-border"></div>
+
+      <div v-else>
+        <label>Email</label>
+        <div class="form-group">
+          <input type="text" class="form-control" v-model="email" />
+        </div>
+
+        <label>Limit</label>
+
+        <select class="form-control" v-model="limit">
+          <option v-for="price in prices" :key="price.value" :value="price.value">{{ price.text }}</option>
+        </select>
+
+        <label>Type</label>
+        <select class="form-control" v-model="type">
+          <option v-for="type in types" :key="type.value" :value="type.value">{{ type.text }}</option>
+        </select>
+
+        <label>Hash</label>
+        <div class="form-group">
+          <input type="text" class="form-control" v-model="hash" />
+        </div>
+
+        <button type="button" class="btn btn-primary w-100" @click="add()">Add</button>
       </div>
-
-      <label>Limit</label>
-      <select class="form-control" v-model="limit">
-        <option v-for="price in prices" :key="price.value" :value="price.value">{{ price.text }}</option>
-      </select>
-
-      <label>Type</label>
-      <select class="form-control" v-model="type">
-        <option v-for="type in types" :key="type.value" :value="type.value">{{ type.text }}</option>
-      </select>
-
-      <label>Hash</label>
-      <div class="form-group">
-        <input type="text" class="form-control" v-model="hash" />
-      </div>
-
-      <button type="button" class="btn btn-primary w-100" @click="add()">Add</button>
     </div>
   </div>
 </template>
@@ -45,7 +50,7 @@ export default {
   },
   data() {
     return {
-      loading: false,
+      isLoading: false,
       prices: [],
       types: [
         { value: "free", text: "Free" },
@@ -62,12 +67,12 @@ export default {
   },
   methods: {
     fetchPrice: function () {
-      this.loading = !this.loading;
+      this.isLoading = !this.isLoading;
       axios({
         url: API_URL + "/price",
         method: "GET",
       }).then((response) => {
-        this.loading = !this.loading;
+        this.isLoading = !this.isLoading;
         this.prices = response.data.map((res) => {
           return {
             value: res.limit,
@@ -77,7 +82,7 @@ export default {
       });
     },
     add: function () {
-      this.loading = !this.loading;
+      this.isLoading = !this.isLoading;
       axios({
         url: API_URL + "/license",
         method: "POST",
@@ -91,7 +96,7 @@ export default {
           hash: this.hash,
         },
       }).then((response) => {
-        this.loading = !this.loading;
+        this.isLoading = !this.isLoading;
         if (!response.data.status)
           return this.showAlert(response.data.message, false);
         this.$router.push({ path: "/license" });

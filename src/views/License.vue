@@ -12,18 +12,20 @@
           type="text"
           class="form-control"
           v-model="keyword"
-          @change="searchLicenses()"
+          @change="search()"
           placeholder="Search by email"
         />
       </div>
 
       <div class="table-responsive-sm">
-        <table class="table table-bordered table-sm bg-white">
+        <div v-if="isLoading" class="spinner-border"></div>
+
+        <table v-else class="table table-bordered table-sm bg-white">
           <thead>
             <th>Time</th>
             <th>Email</th>
-            <th>Value</th>
             <th>Limit</th>
+            <th>Value</th>
             <th>Action</th>
           </thead>
           <tbody>
@@ -42,6 +44,7 @@
                   v-bind:class="{ 'text-primary':  license.type == 'pay'}"
                 >{{ license.email }}</span>
               </td>
+              <td>{{ license.price.limit }}</td>
               <td>
                 <div class="input-group mb-2 input-group-sm">
                   <input type="password" class="form-control" v-model="license.value" />
@@ -56,7 +59,6 @@
                   </div>
                 </div>
               </td>
-              <td>{{ license.price.limit }}</td>
               <td>
                 <button
                   v-if="(Date.now() - new Date(license.time)) / 864e5 < license.price.limit"
@@ -89,6 +91,7 @@ export default {
   },
   data() {
     return {
+      isLoading: false,
       keyword: "",
       licenses: [],
       perPage: 10,
@@ -96,10 +99,11 @@ export default {
     };
   },
   mounted: function () {
-    this.fetchLicenses();
+    this.fetch();
   },
   methods: {
-    fetchLicenses: function (page) {
+    fetch: function (page) {
+      this.isLoading = !this.isLoading;
       axios({
         url:
           API_URL +
@@ -112,13 +116,15 @@ export default {
         },
       })
         .then((response) => {
+          this.isLoading = !this.isLoading;
           this.licenses = response.data.docs;
           this.totalRows = response.data.length;
         })
         .catch(() => this.$router.push({ path: "/login" }));
     },
-    searchLicenses: function (page) {
-      if (this.keyword == "") return this.fetchLicenses();
+    search: function (page) {
+      if (this.keyword == "") return this.fetch();
+      this.isLoading = !this.isLoading;
       axios({
         url:
           API_URL +
@@ -131,6 +137,7 @@ export default {
         },
       })
         .then((response) => {
+          this.isLoading = !this.isLoading;
           this.licenses = response.data.docs;
           this.totalRows = response.data.length;
         })
@@ -155,7 +162,7 @@ export default {
             token: localStorage.getItem("token"),
           },
         }).then((response) => {
-          this.fetchLicenses();
+          this.fetch();
         });
 
       axios({
@@ -165,7 +172,7 @@ export default {
           token: localStorage.getItem("token"),
         },
       }).then((response) => {
-        this.fetchLicenses();
+        this.fetch();
       });
     },
     clipboardSuccess: function ({ value, event }) {

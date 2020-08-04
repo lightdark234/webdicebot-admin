@@ -8,7 +8,9 @@
       </router-link>
 
       <div class="table-responsive-sm">
-        <table class="table table-bordered table-sm bg-white">
+        <div v-if="isLoading" class="spinner-border"></div>
+
+        <table v-else class="table table-bordered table-sm bg-white">
           <thead>
             <th>Title</th>
             <th>Url</th>
@@ -40,6 +42,7 @@ export default {
   },
   data() {
     return {
+      isLoading: false,
       refs: [],
       perPage: 10,
       currentPage: 1,
@@ -47,10 +50,11 @@ export default {
     };
   },
   mounted: function () {
-    this.fetchData();
+    this.fetch();
   },
   methods: {
-    fetchData: function (page) {
+    fetch: function (page) {
+      this.isLoading = !this.isLoading;
       axios({
         url:
           API_URL +
@@ -61,6 +65,7 @@ export default {
         },
       })
         .then((response) => {
+          this.isLoading = !this.isLoading;
           this.refs = response.data.docs;
           this.totalPage = response.data.totalPages;
         })
@@ -84,7 +89,7 @@ export default {
           token: localStorage.getItem("token"),
         },
       }).then((response) => {
-        this.fetchData();
+        this.fetch();
       });
     },
   },

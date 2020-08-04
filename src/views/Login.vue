@@ -1,16 +1,20 @@
 <template>
   <div class="container p-4">
-    <label>User name</label>
-    <div class="form-group">
-      <input type="text" class="form-control" v-model="userName" />
-    </div>
+    <div v-if="isLoading" class="spinner-border"></div>
 
-    <label>Password</label>
-    <div class="form-group">
-      <input type="password" class="form-control" v-model="password" />
-    </div>
+    <div v-else>
+      <label>User name</label>
+      <div class="form-group">
+        <input type="text" class="form-control" v-model="userName" />
+      </div>
 
-    <button type="button" class="btn btn-primary w-100" @click="login()">Login</button>
+      <label>Password</label>
+      <div class="form-group">
+        <input type="password" class="form-control" v-model="password" />
+      </div>
+
+      <button type="button" class="btn btn-primary w-100" @click="login()">Login</button>
+    </div>
   </div>
 </template>
 
@@ -21,12 +25,14 @@ import API_URL from "@/utils/apiUrl";
 export default {
   data() {
     return {
+      isLoading: false,
       userName: "",
       password: "",
     };
   },
   methods: {
     login: function () {
+      this.isLoading = !this.isLoading;
       axios({
         url: API_URL + "/user/login",
         method: "POST",
@@ -35,6 +41,7 @@ export default {
           password: this.password,
         },
       }).then((response) => {
+        this.isLoading = !this.isLoading;
         if (!response.data.status)
           return this.showAlert(response.data.message, false);
         localStorage.setItem("token", response.data.token);

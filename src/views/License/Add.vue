@@ -2,27 +2,35 @@
   <div>
     <Nav />
 
-    <b-container>
-      <router-link to="/admin/license">
-        <b-button class="mb-2">Cancel</b-button>
+    <div class="container pt-4">
+      <router-link to="/license">
+        <button type="button" class="btn btn-secondary mb-2">Cancel</button>
       </router-link>
 
-      <b-overlay :show="loading" rounded="sm">
-        <label>Email</label>
-        <b-form-input v-model="email" class="mb-2"></b-form-input>
+      <hr />
 
-        <label>Limit</label>
-        <b-form-select v-model="limit" :options="prices" class="mb-2"></b-form-select>
+      <label>Email</label>
+      <div class="form-group">
+        <input type="text" class="form-control" v-model="email" />
+      </div>
 
-        <label>Type</label>
-        <b-form-select v-model="type" :options="types" class="mb-2"></b-form-select>
+      <label>Limit</label>
+      <select class="form-control" v-model="limit">
+        <option v-for="price in prices" :key="price.value" :value="price.value">{{ price.text }}</option>
+      </select>
 
-        <label>Hash</label>
-        <b-form-input v-model="hash" class="mb-2"></b-form-input>
+      <label>Type</label>
+      <select class="form-control" v-model="type">
+        <option v-for="type in types" :key="type.value" :value="type.value">{{ type.text }}</option>
+      </select>
 
-        <b-button variant="primary" block @click="add()">Add</b-button>
-      </b-overlay>
-    </b-container>
+      <label>Hash</label>
+      <div class="form-group">
+        <input type="text" class="form-control" v-model="hash" />
+      </div>
+
+      <button type="button" class="btn btn-primary w-100" @click="add()">Add</button>
+    </div>
   </div>
 </template>
 
@@ -33,7 +41,7 @@ import API_URL from "@/utils/apiUrl";
 
 export default {
   components: {
-    Nav
+    Nav,
   },
   data() {
     return {
@@ -41,63 +49,63 @@ export default {
       prices: [],
       types: [
         { value: "free", text: "Free" },
-        { value: "pay", text: "Pay" }
+        { value: "pay", text: "Pay" },
       ],
       email: "",
       limit: 10,
       type: "free",
-      hash: ""
+      hash: "",
     };
   },
-  mounted: function() {
+  mounted: function () {
     this.fetchPrice();
   },
   methods: {
-    fetchPrice: function() {
+    fetchPrice: function () {
       this.loading = !this.loading;
       axios({
         url: API_URL + "/price",
-        method: "GET"
-      }).then(response => {
+        method: "GET",
+      }).then((response) => {
         this.loading = !this.loading;
-        this.prices = response.data.map(res => {
+        this.prices = response.data.map((res) => {
           return {
             value: res.limit,
-            text: res.limit
+            text: res.limit,
           };
         });
       });
     },
-    add: function() {
+    add: function () {
       this.loading = !this.loading;
       axios({
         url: API_URL + "/license",
         method: "POST",
         headers: {
-          token: localStorage.getItem("token")
+          token: localStorage.getItem("token"),
         },
         data: {
           email: this.email,
           limit: this.limit,
           type: this.type,
-          hash: this.hash
-        }
-      }).then(response => {
+          hash: this.hash,
+        },
+      }).then((response) => {
         this.loading = !this.loading;
         if (!response.data.status)
           return this.showAlert(response.data.message, false);
-        this.$router.push({ path: "/admin/license" });
+        this.$router.push({ path: "/license" });
       });
     },
-    showAlert: function(message, type = true) {
+    showAlert: function (message, type = true) {
       this.$swal.fire({
         icon: `${type ? "success" : "error"}`,
         title: message,
         showConfirmButton: false,
-        timer: 15e2
+        timer: 15e2,
       });
-    }
-  }
+    },
+  },
 };
 </script>
 

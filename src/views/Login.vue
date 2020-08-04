@@ -1,15 +1,17 @@
 <template>
-  <b-container class="p-4">
-    <b-overlay :show="loading" rounded="sm">
-      <label>User name</label>
-      <b-form-input v-model="userName" class="mb-2"></b-form-input>
+  <div class="container p-4">
+    <label>User name</label>
+    <div class="form-group">
+      <input type="text" class="form-control" v-model="userName" />
+    </div>
 
-      <label>Password</label>
-      <b-form-input v-model="password" type="password" class="mb-2"></b-form-input>
+    <label>Password</label>
+    <div class="form-group">
+      <input type="password" class="form-control" v-model="password" />
+    </div>
 
-      <b-button variant="primary" block @click="login()">Login</b-button>
-    </b-overlay>
-  </b-container>
+    <button type="button" class="btn btn-primary w-100" @click="login()">Login</button>
+  </div>
 </template>
 
 <script>
@@ -19,14 +21,12 @@ import API_URL from "@/utils/apiUrl";
 export default {
   data() {
     return {
-      loading: false,
       userName: "",
       password: "",
     };
   },
   methods: {
     login: function () {
-      this.loading = !this.loading;
       axios({
         url: API_URL + "/user/login",
         method: "POST",
@@ -35,7 +35,6 @@ export default {
           password: this.password,
         },
       }).then((response) => {
-        this.loading = !this.loading;
         if (!response.data.status)
           return this.showAlert(response.data.message, false);
         localStorage.setItem("token", response.data.token);

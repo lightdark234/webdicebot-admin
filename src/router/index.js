@@ -1,11 +1,13 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Login from '@/views/Login'
-import Admin from '@/views/Admin'
-import AdminLicense from '@/views/License'
-import AdminAddLicense from '@/views/License/Add'
-import AdminPrice from '@/views/Price'
-import AdminAddPrice from '@/views/Price/Add'
+import Home from '@/views/Home'
+import License from '@/views/License'
+import AddLicense from '@/views/License/Add'
+import Price from '@/views/Price'
+import AddPrice from '@/views/Price/Add'
+import Ref from '@/views/Ref'
+import AddRef from '@/views/Ref/Add'
 
 Vue.use(Router)
 
@@ -19,32 +21,44 @@ const router = new Router({
     },
     {
       path: '/',
-      name: 'Admin',
-      component: Admin,
+      name: 'Home',
+      component: Home,
       meta: { requiresAuth: true }
     },
     {
-      path: '/admin/license',
-      name: 'Admin license',
-      component: AdminLicense,
+      path: '/license',
+      name: 'License',
+      component: License,
       meta: { requiresAuth: true }
     },
     {
-      path: '/admin/license/add',
-      name: 'Admin Add license',
-      component: AdminAddLicense,
+      path: '/license/add',
+      name: 'Add license',
+      component: AddLicense,
       meta: { requiresAuth: true }
     },
     {
-      path: '/admin/price',
-      name: 'Admin price',
-      component: AdminPrice,
+      path: '/price',
+      name: 'Price',
+      component: Price,
       meta: { requiresAuth: true }
     },
     {
-      path: '/admin/price/add',
-      name: 'Admin add price',
-      component: AdminAddPrice,
+      path: '/price/add',
+      name: 'Add price',
+      component: AddPrice,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/ref',
+      name: 'Ref',
+      component: Ref,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/ref/add',
+      name: 'Add ref',
+      component: AddRef,
       meta: { requiresAuth: true }
     },
     {

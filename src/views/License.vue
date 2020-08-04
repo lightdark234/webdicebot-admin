@@ -2,83 +2,79 @@
   <div>
     <Nav />
 
-    <b-overlay :show="loading" rounded="sm">
-      <b-container>
-        <router-link to="/admin/license/add">
-          <b-button variant="primary" class="mb-2">Add</b-button>
-        </router-link>
+    <div class="container pt-4">
+      <router-link to="/license/add">
+        <button type="button" class="btn btn-primary mb-2">Add</button>
+      </router-link>
 
-        <b-row>
-          <b-col sm="12" md="12">
-            <b-form-input
-              v-model="keyword"
-              class="mb-2"
-              @change="searchLicenses()"
-              placeholder="Search by email"
-            ></b-form-input>
-          </b-col>
-        </b-row>
+      <div class="form-group">
+        <input
+          type="text"
+          class="form-control"
+          v-model="keyword"
+          @change="searchLicenses()"
+          placeholder="Search by email"
+        />
+      </div>
 
-        <div class="table-responsive-sm">
-          <table class="table table-bordered table-sm bg-white">
-            <thead>
-              <th>Time</th>
-              <th>Email</th>
-              <th>Value</th>
-              <th>Limit</th>
-              <th>Action</th>
-            </thead>
-            <tbody>
-              <tr v-for="license in licenses" :key="license._id">
-                <td>{{ new Date(license.time).toLocaleDateString('vi-VN') }}</td>
-                <td>
-                  <span
-                    v-if="license.locked ||  (Date.now() - new Date(license.time)) / 864e5 > license.price.limit"
-                  >
-                    <strike
-                      v-bind:class="{ 'text-primary':  license.type == 'pay'}"
-                    >{{ license.email }}</strike>
-                  </span>
-                  <span
-                    v-else
+      <div class="table-responsive-sm">
+        <table class="table table-bordered table-sm bg-white">
+          <thead>
+            <th>Time</th>
+            <th>Email</th>
+            <th>Value</th>
+            <th>Limit</th>
+            <th>Action</th>
+          </thead>
+          <tbody>
+            <tr v-for="license in licenses" :key="license._id">
+              <td>{{ new Date(license.time).toLocaleDateString('vi-VN') }}</td>
+              <td>
+                <span
+                  v-if="license.locked ||  (Date.now() - new Date(license.time)) / 864e5 > license.price.limit"
+                >
+                  <strike
                     v-bind:class="{ 'text-primary':  license.type == 'pay'}"
-                  >{{ license.email }}</span>
-                </td>
-                <td>
-                  <b-input-group size="sm" class="mb-2">
-                    <b-form-input v-model="license.value" type="password"></b-form-input>
-                    <b-input-group-append>
-                      <b-button
-                        variant="primary"
-                        v-clipboard="() => license.value"
-                        v-clipboard:success="clipboardSuccess"
-                        v-clipboard:error="clipboardError"
-                      >Copy</b-button>
-                    </b-input-group-append>
-                  </b-input-group>
-                </td>
-                <td>{{ license.price.limit }}</td>
-                <td>
-                  <b-button
-                    v-if="(Date.now() - new Date(license.time)) / 864e5 < license.price.limit"
-                    variant="warning"
-                    size="sm"
-                    class="mb-2"
-                    @click="confirm(license._id, `${license.locked ? 'unlock' : 'lock'}`)"
-                  >{{ license.locked ? 'Unlock' : 'Lock' }}</b-button>
-                  <b-button
-                    variant="danger"
-                    size="sm"
-                    class="mb-2"
-                    @click="confirm(license._id, 'delete')"
-                  >Delete</b-button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </b-container>
-    </b-overlay>
+                  >{{ license.email }}</strike>
+                </span>
+                <span
+                  v-else
+                  v-bind:class="{ 'text-primary':  license.type == 'pay'}"
+                >{{ license.email }}</span>
+              </td>
+              <td>
+                <div class="input-group mb-2 input-group-sm">
+                  <input type="password" class="form-control" v-model="license.value" />
+                  <div class="input-group-append">
+                    <button
+                      type="button"
+                      class="btn btn-primary"
+                      v-clipboard="() => license.value"
+                      v-clipboard:success="clipboardSuccess"
+                      v-clipboard:error="clipboardError"
+                    >Copy</button>
+                  </div>
+                </div>
+              </td>
+              <td>{{ license.price.limit }}</td>
+              <td>
+                <button
+                  v-if="(Date.now() - new Date(license.time)) / 864e5 < license.price.limit"
+                  type="button"
+                  class="btn btn-warning btn-sm mb-2"
+                  @click="confirm(license._id, `${license.locked ? 'unlock' : 'lock'}`)"
+                >{{ license.locked ? 'Unlock' : 'Lock' }}</button>
+                <button
+                  type="button"
+                  class="btn btn-danger btn-sm mb-2"
+                  @click="confirm(license._id, 'delete')"
+                >Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -94,9 +90,8 @@ export default {
   data() {
     return {
       keyword: "",
-      loading: false,
       licenses: [],
-      perPage: 20,
+      perPage: 10,
       currentPage: 1,
     };
   },
@@ -105,7 +100,6 @@ export default {
   },
   methods: {
     fetchLicenses: function (page) {
-      this.loading = !this.loading;
       axios({
         url:
           API_URL +
@@ -118,8 +112,6 @@ export default {
         },
       })
         .then((response) => {
-          this.loading = !this.loading;
-          // console.log(response.data);
           this.licenses = response.data.docs;
           this.totalRows = response.data.length;
         })
@@ -127,8 +119,6 @@ export default {
     },
     searchLicenses: function (page) {
       if (this.keyword == "") return this.fetchLicenses();
-
-      this.loading = !this.loading;
       axios({
         url:
           API_URL +
@@ -141,8 +131,6 @@ export default {
         },
       })
         .then((response) => {
-          this.loading = !this.loading;
-          // console.log(response.data);
           this.licenses = response.data.docs;
           this.totalRows = response.data.length;
         })
@@ -155,7 +143,6 @@ export default {
           showCancelButton: true,
         })
         .then((result) => {
-          // console.log(result);
           if (result.value) return this.action(id, action);
         });
     },
@@ -168,7 +155,6 @@ export default {
             token: localStorage.getItem("token"),
           },
         }).then((response) => {
-          // console.log(response);
           this.fetchLicenses();
         });
 
@@ -179,7 +165,6 @@ export default {
           token: localStorage.getItem("token"),
         },
       }).then((response) => {
-        // console.log(response);
         this.fetchLicenses();
       });
     },

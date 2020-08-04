@@ -3,27 +3,23 @@
     <Nav />
 
     <div class="container pt-4">
-      <router-link to="/price/add">
+      <router-link to="/ref/add">
         <button type="button" class="btn btn-primary mb-2">Add</button>
       </router-link>
 
       <div class="table-responsive-sm">
         <table class="table table-bordered table-sm bg-white">
           <thead>
-            <th>Limit</th>
-            <th>Amount</th>
+            <th>Title</th>
+            <th>Url</th>
             <th>Action</th>
           </thead>
           <tbody>
-            <tr v-for="price in prices" :key="price._id">
-              <td>{{ price.limit }} Days</td>
-              <td>{{ price.amount.pay.toLocaleString() }} Doge</td>
+            <tr v-for="ref in refs" :key="ref._id">
+              <td>{{ ref.title.slice(0, 32) }}</td>
+              <td>{{ ref.url }}</td>
               <td>
-                <button
-                  type="button"
-                  class="btn btn-danger btn-sm"
-                  @click="confirm(price._id)"
-                >Delete</button>
+                <button type="button" class="btn btn-danger btn-sm" @click="confirm(ref._id)">Delete</button>
               </td>
             </tr>
           </tbody>
@@ -44,52 +40,29 @@ export default {
   },
   data() {
     return {
-      loading: false,
-      prices: [],
-      perPage: 20,
-      selectPer: [
-        {
-          value: 20,
-          text: 20,
-        },
-        {
-          value: 50,
-          text: 50,
-        },
-        {
-          value: 200,
-          text: 200,
-        },
-        {
-          value: 500,
-          text: 500,
-        },
-      ],
+      refs: [],
+      perPage: 10,
       currentPage: 1,
+      totalPage: 0,
     };
   },
   mounted: function () {
-    this.fetchPrices();
-  },
-  computed: {
-    rows() {
-      return this.prices.length;
-    },
+    this.fetchData();
   },
   methods: {
-    fetchPrices: function (page) {
-      this.loading = !this.loading;
+    fetchData: function (page) {
       axios({
         url:
           API_URL +
-          `/price?limit=${this.perPage}&page=${page ? page : this.currentPage}`,
+          `/ref?limit=${this.perPage}&page=${page ? page : this.currentPage}`,
         method: "GET",
+        headers: {
+          token: localStorage.getItem("token"),
+        },
       })
         .then((response) => {
-          this.loading = !this.loading;
-          // console.log(response.data);
-          this.prices = response.data.docs;
-          this.totalRows = response.data.length;
+          this.refs = response.data.docs;
+          this.totalPage = response.data.totalPages;
         })
         .catch(() => this.$router.push({ path: "/login" }));
     },
@@ -100,20 +73,18 @@ export default {
           showCancelButton: true,
         })
         .then((result) => {
-          // console.log(result);
           if (result.value) return this.delete(id);
         });
     },
     delete: function (id) {
       axios({
-        url: API_URL + "/price/" + id,
+        url: API_URL + "/ref/delete/" + id,
         method: "DELETE",
         headers: {
           token: localStorage.getItem("token"),
         },
       }).then((response) => {
-        // console.log(response);
-        this.fetchPrices();
+        this.fetchData();
       });
     },
   },

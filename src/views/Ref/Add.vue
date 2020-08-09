@@ -12,14 +12,21 @@
       <div v-if="isLoading" class="spinner-border"></div>
 
       <div v-else>
-        <label>Title</label>
         <div class="form-group">
+          <label>Title</label>
           <input type="text" class="form-control" v-model="title" />
         </div>
 
-        <label>Url</label>
         <div class="form-group">
+          <label>Url</label>
           <input type="text" class="form-control" v-model="url" />
+        </div>
+
+        <div class="form-group">
+          <label>Type</label>
+          <select v-model="type" class="form-control" id="sel1">
+            <option v-for="type in selectType" :key="type" :value="type">{{ type }}</option>
+          </select>
         </div>
 
         <button type="button" class="btn btn-primary w-100" @click="add()">Add</button>
@@ -42,6 +49,8 @@ export default {
       isLoading: false,
       title: "",
       url: "",
+      type: "Admin",
+      selectType: ["Admin", "User"],
     };
   },
   methods: {
@@ -56,6 +65,7 @@ export default {
         data: {
           title: this.title,
           url: this.url,
+          type: this.type
         },
       }).then((response) => {
         this.isLoading = !this.isLoading;

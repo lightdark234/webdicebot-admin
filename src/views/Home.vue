@@ -27,37 +27,51 @@
       <div class="row text-white">
         <div class="col-sm-12 col-md-3">
           <div class="rounded p-4 bg-warning mb-2 text-center">
-            Income DOGE
-            <hr class="mt-2 mb-2" />
-            <div v-if="isLoading" class="spinner-border"></div>
-            <h4 v-else>{{ doge.toLocaleString() }}</h4>
+            DOGE
+            <h4>
+              <span v-if="isLoading">?</span>
+              <span v-else>{{ doge.toLocaleString() }}</span>
+            </h4>
           </div>
         </div>
+
+        <!-- <div class="col-sm-12 col-md-3">
+          <div class="rounded p-4 bg-secondary mb-2 text-center">
+            VND
+            <h4>
+              <span v-if="isLoading">?</span>
+              <span v-else>{{ vnd.toLocaleString() }}</span>
+            </h4>
+          </div>
+        </div>-->
 
         <div class="col-sm-12 col-md-3">
           <div class="rounded p-4 bg-primary mb-2 text-center">
             License
-            <hr class="mt-2 mb-2" />
-            <div v-if="isLoading" class="spinner-border"></div>
-            <h4 v-else>{{ license }}</h4>
+            <h4>
+              <span v-if="isLoading">?</span>
+              <span v-else>{{ license }}</span>
+            </h4>
           </div>
         </div>
 
         <div class="col-sm-12 col-md-3">
           <div class="rounded p-4 bg-success mb-2 text-center">
             Pay
-            <hr class="mt-2 mb-2" />
-            <div v-if="isLoading" class="spinner-border"></div>
-            <h4 v-else>{{ pay }}</h4>
+            <h4>
+              <span v-if="isLoading">?</span>
+              <span v-else>{{ pay }}</span>
+            </h4>
           </div>
         </div>
 
         <div class="col-sm-12 col-md-3">
           <div class="rounded p-4 bg-danger mb-2 text-center">
             Free
-            <hr class="mt-2 mb-2" />
-            <div v-if="isLoading" class="spinner-border"></div>
-            <h4 v-else>{{ free }}</h4>
+            <h4>
+              <span v-if="isLoading">?</span>
+              <span v-else>{{ free }}</span>
+            </h4>
           </div>
         </div>
       </div>
@@ -84,6 +98,7 @@ export default {
       free: 0,
       pay: 0,
       doge: 0,
+      vnd: 0,
       from: 0,
       to: 0,
     };
@@ -107,6 +122,25 @@ export default {
           this.filter();
         })
         .catch(() => this.$router.push({ path: "/login" }));
+    },
+    getPrice: async function () {
+      let result = await axios({
+        url: "https://api-prod.bitmoon.net/graphql",
+        method: "POST",
+        data: {
+          query:
+            "\n    query getPriceBookPaging ($page_size: Int, $page: Int, $sort_name: String, $sort_type: String, $search: String) {\n      apiPricebookPaging (page_size: $page_size, page: $page, sort_name: $sort_name, sort_type: $sort_type, search: $search){\n        total,\n        data {\n        id,\n        coin_id,\n        coin_name,\n        bid_price_usd,\n        fast_bid_price,\n        ask_price_usd,\n        bid_price_btc,\n        ask_price_btc,\n        bid_price_vnd,\n        ask_price_vnd,\n        fast_ask_price,\n        fast,\n        normal,\n        sort_no,\n        buy_profit,\n        sell_profit,\n        change_24h,\n        volume,\n        coin\n      }\n    }\n  }\n",
+          variables: {
+            page_size: 50,
+            page: 1,
+            sort_name: "volume",
+            sort_type: "desc",
+            search: "doge",
+          },
+        },
+      });
+
+      return result.data.data.apiPricebookPaging.data[0];
     },
     filter: function (type) {
       switch (type) {
@@ -145,6 +179,11 @@ export default {
           }
         }
       });
+
+      // this.getPrice().then((response) => {
+      //   // console.log(response);
+      //   this.vnd = this.doge * response.fast_bid_price;
+      // });
     },
   },
 };

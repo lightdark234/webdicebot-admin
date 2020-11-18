@@ -7,6 +7,26 @@
         <button type="button" class="btn btn-primary mb-2">Add</button>
       </router-link>
 
+      <div class="mt-3 mb-3">
+        Total license: {{ totalDocs }} | Total pages: {{ totalPages }}
+      </div>
+
+      <ul class="pagination">
+        <li class="page-item">
+          <button class="page-link" v-if="hasPrevPage" @click="fetch(page - 1)">
+            Previous
+          </button>
+        </li>
+        <li class="page-item active">
+          <a class="page-link" href="#">{{ page }}</a>
+        </li>
+        <li class="page-item">
+          <button class="page-link" v-if="hasNextPage" @click="fetch(page + 1)">
+            Next
+          </button>
+        </li>
+      </ul>
+
       <div class="form-group">
         <input
           type="text"
@@ -30,24 +50,34 @@
           </thead>
           <tbody>
             <tr v-for="license in licenses" :key="license._id">
-              <td>{{ new Date(license.time).toLocaleDateString('vi-VN') }}</td>
+              <td>{{ new Date(license.time).toLocaleDateString("vi-VN") }}</td>
               <td>
                 <span
-                  v-if="license.locked ||  (Date.now() - new Date(license.time)) / 864e5 > license.price.limit"
+                  v-if="
+                    license.locked ||
+                    (Date.now() - new Date(license.time)) / 864e5 >
+                      license.price.limit
+                  "
                 >
                   <strike
-                    v-bind:class="{ 'text-primary':  license.type == 'pay'}"
-                  >{{ license.email }}</strike>
+                    v-bind:class="{ 'text-primary': license.type == 'pay' }"
+                    >{{ license.email }}</strike
+                  >
                 </span>
                 <span
                   v-else
-                  v-bind:class="{ 'text-primary':  license.type == 'pay'}"
-                >{{ license.email }}</span>
+                  v-bind:class="{ 'text-primary': license.type == 'pay' }"
+                  >{{ license.email }}</span
+                >
               </td>
               <td>{{ license.price.limit }}</td>
               <td>
                 <div class="input-group mb-2 input-group-sm">
-                  <input type="password" class="form-control" v-model="license.value" />
+                  <input
+                    type="password"
+                    class="form-control"
+                    v-model="license.value"
+                  />
                   <div class="input-group-append">
                     <button
                       type="button"
@@ -55,22 +85,36 @@
                       v-clipboard="() => license.value"
                       v-clipboard:success="clipboardSuccess"
                       v-clipboard:error="clipboardError"
-                    >Copy</button>
+                    >
+                      Copy
+                    </button>
                   </div>
                 </div>
               </td>
               <td>
                 <button
-                  v-if="(Date.now() - new Date(license.time)) / 864e5 < license.price.limit"
+                  v-if="
+                    (Date.now() - new Date(license.time)) / 864e5 <
+                    license.price.limit
+                  "
                   type="button"
                   class="btn btn-warning btn-sm mb-2"
-                  @click="confirm(license._id, `${license.locked ? 'unlock' : 'lock'}`)"
-                >{{ license.locked ? 'Unlock' : 'Lock' }}</button>
+                  @click="
+                    confirm(
+                      license._id,
+                      `${license.locked ? 'unlock' : 'lock'}`
+                    )
+                  "
+                >
+                  {{ license.locked ? "Unlock" : "Lock" }}
+                </button>
                 <button
                   type="button"
                   class="btn btn-danger btn-sm mb-2"
                   @click="confirm(license._id, 'delete')"
-                >Delete</button>
+                >
+                  Delete
+                </button>
               </td>
             </tr>
           </tbody>
@@ -96,6 +140,11 @@ export default {
       licenses: [],
       perPage: 10,
       currentPage: 1,
+      page: 1,
+      totalDocs: 0,
+      totalPages: 0,
+      hasPrevPage: false,
+      hasNextPage: false,
     };
   },
   mounted: function () {
@@ -118,7 +167,11 @@ export default {
         .then((response) => {
           this.isLoading = !this.isLoading;
           this.licenses = response.data.docs;
-          this.totalRows = response.data.length;
+          this.page = response.data.page;
+          this.totalDocs = response.data.totalDocs;
+          this.totalPages = response.data.totalPages;
+          this.hasPrevPage = response.data.hasPrevPage;
+          this.hasNextPage = response.data.hasNextPage;
         })
         .catch(() => this.$router.push({ path: "/login" }));
     },
@@ -139,7 +192,6 @@ export default {
         .then((response) => {
           this.isLoading = !this.isLoading;
           this.licenses = response.data.docs;
-          this.totalRows = response.data.length;
         })
         .catch(() => this.$router.push({ path: "/login" }));
     },
